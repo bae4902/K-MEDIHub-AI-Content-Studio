@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-MEDI HUB 실시간 AI 콘텐츠 스튜디오 v14.0</title>
+    <!-- Pretendard Font -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        kmedi: {
+                            sidebar: '#0b192c',
+                            blue: '#0b2d6a',
+                            lightBlue: '#1e4b9e',
+                            green: '#2e8b57',
+                            emerald: '#10b981',
+                            purple: '#6d28d9',
+                            dark: '#1e293b',
+                            grayBg: '#f8fafc',
+                            cardBg: '#ffffff',
+                            border: '#e2e8f0',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .gradient-kmedi {
+            background: linear-gradient(135deg, #0b2d6a 0%, #1e4b9e 50%, #2e8b57 100%);
+        }
+        .gradient-dark {
+            background: linear-gradient(145deg, #0b192c 0%, #1e293b 100%);
+        }
+        .gradient-accent {
+            background: linear-gradient(135deg, #6d28d9 0%, #0b2d6a 100%);
+        }
+
+        /* Card Canvas Box */
+        .card-canvas-container {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Active Nav Item */
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(46, 139, 87, 0.25) 0%, rgba(11, 45, 106, 0.3) 100%);
+            border-left: 4px solid #10b981;
+            color: #ffffff;
+            font-weight: 700;
+        }
+        .nav-item {
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .nav-item:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+            color: #f8fafc;
+        }
+
+        /* Toast Animation */
+        #toast {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+        }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row min-h-screen antialiased text-slate-800 bg-slate-100">
+
+    <!-- Mobile Header -->
+    <header class="md:hidden bg-[#0b192c] text-white p-4 flex items-center justify-between sticky top-0 z-50 shadow-md">
+        <div class="flex items-center space-x-2">
+            <span class="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center font-black text-xs text-white">K</span>
+            <div>
+                <h1 class="font-extrabold text-base leading-tight">K-MEDI HUB</h1>
+                <p class="text-[10px] text-slate-400">AI 콘텐츠 스튜디오 v14.0</p>
+            </div>
+        </div>
+        <button id="mobileMenuBtn" type="button" class="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white focus:outline-none" aria-label="메뉴 열기">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+    </header>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="w-full md:w-72 bg-[#0b192c] text-white flex-shrink-0 flex flex-col md:h-screen md:sticky md:top-0 z-40 transition-all duration-300 hidden md:flex shadow-xl border-r border-slate-800">
+        <!-- Logo Branding -->
+        <div class="p-6 border-b border-slate-800/80 bg-slate-900/40">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-blue-700 flex items-center justify-center shadow-lg shadow-emerald-900/30">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-black text-xl tracking-tight text-white">K-MEDI HUB</span>
+                        <span class="px-1.5 py-0.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded">v14.0</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 font-medium">대구경북첨단의료산업진흥재단</p>
+                </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+                <span class="flex items-center text-emerald-400 font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping mr-1.5"></span>
+                    AI 엔진 활성화
+                </span>
+                <span class="text-slate-400">BioLLM-v14.0</span>
+            </div>
+        </div>
+
+        <!-- Center Selector Filter -->
+        <div class="px-4 py-3 bg-slate-900/60 border-b border-slate-800">
+            <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5 tracking-wider">주요 지원센터 선택</label>
+            <select id="centerSelector" class="w-full bg-slate-800 text-xs text-slate-200 border border-slate-700 rounded-lg px-2.5 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                <option value="all">🏢 재단 전체 (통합)</option>
+                <option value="drug" selected>💊 신약개발지원센터 (New Drug)</option>
+                <option value="device">🔬 첨단의료기기개발지원센터 (Device)</option>
+                <option value="preclinical">🐁 전임상센터 (Preclinical / Animal)</option>
+                <option value="gmp">🏭 의약생산센터 (GMP Production)</option>
+                <option value="training">🎓 의료기술시험연수원 / 인재양성</option>
+            </select>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+            <button type="button" class="nav-item active w-full flex items-center justify-between px-3.5 py-3 rounded-lg text-sm font-medium text-slate-300" data-tab="tab-press">
+                <div class="flex items-center space-x-3">
+                    <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                    <span>AI 보도자료 & 뉴스</span>
+                </div>
+                <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">기사</span>
+            </button>
+
+            <button type="button" class="nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-lg text-sm font-medium text-slate-300" data-tab="tab-cardnews">
+                <div class="flex items-center space-x-3">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <span>실시간 카드뉴스 스튜디오</span>
+                </div>
+                <span class="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded">캔버스</span>
+            </button>
+
+            <button type="button" class="nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-lg text-sm font-medium text-slate-300" data-tab="tab-poster">
+                <div class="flex items-center space-x-3">
+                    <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <span>학술 포스터 & 초록 요약</span>
+                </div>
+                <span class="text-[10px] bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded">R&D</span>
+            </button>
+
+            <button type="button" class="nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-lg text-sm font-medium text-slate-300" data-tab="tab-video">
+                <div class="flex items-center space-x-3">
+                    <svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    <span>숏폼 & 영상 스크립트</span>
+                </div>
+                <span class="text-[10px] bg-rose-500/20 text-rose-400 px-1.5 py-0.5 rounded">영상</span>
+            </button>
+
+            <button type="button" class="nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-lg text-sm font-medium text-slate-300" data-tab="tab-archive">
+                <div class="flex items-center space-x-3">
+                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                    <span>콘텐츠 보관함 & 아카이브</span>
+                </div>
+                <span id="savedCountBadge" class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full font-bold">3</span>
+            </button>
+        </nav>
+
+        <!-- System Status Footer -->
+        <div class="p-4 border-t border-slate-800 text-xs text-slate-400 bg-slate-900/50">
+            <div class="flex items-center justify-between mb-1">
+                <span>시스템 정상 가동</span>
+                <span class="text-emerald-400 font-mono text-[11px]">99.98%</span>
+            </div>
+            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full w-[98%]"></div>
+            </div>
+            <p class="mt-2 text-[10px] text-slate-500">K-MEDI HUB Digital Media Center v14.0</p>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-auto md:h-screen overflow-y-auto">
+        <!-- Top Toolbar Header -->
+        <div class="bg-white border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sticky top-0 z-30 shadow-sm">
+            <div class="flex items-center space-x-3">
+                <div id="pageIconBox" class="p-2 rounded-lg bg-emerald-50 text-emerald-700">
+                    <svg id="pageIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                </div>
+                <div>
+                    <h2 id="pageTitle" class="text-lg font-bold text-slate-900 tracking-tight">AI 보도자료 & 성과 기사 생성기</h2>
+                    <p id="pageSubtitle" class="text-xs text-slate-500">연구개발 및 사업 성과 데이터를 표준 공공기관 보도자료 규격으로 즉시 생성합니다.</p>
+                </div>
+            </div>
+
+            <!-- Quick Action Buttons -->
+            <div class="flex items-center space-x-2 self-end sm:self-auto">
+                <button id="quickPresetBtn" type="button" class="text-xs font-semibold px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg flex items-center space-x-1.5 transition">
+                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    <span>추천 예시 불러오기</span>
+                </button>
+                <button id="resetFormBtn" type="button" class="text-xs font-semibold px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition">
+                    초기화
+                </button>
+                <div class="h-6 w-px bg-slate-200"></div>
+                <span class="inline-flex items-center text-xs font-medium text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                    실시간 생성 엔진 대기 중
+                </span>
+            </div>
+        </div>
+
+        <!-- Tab 1: AI 보도자료 생성기 -->
+        <section id="tab-press" class="tab-content p-6 space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Input Panel -->
+                <div class="lg:col-span-5 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <h3 class="font-bold text-slate-800 text-sm flex items-center">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>
+                                보도자료 기본 정보 입력
+                            </h3>
+                            <span class="text-[11px] text-slate-400">v14.0 규격</span>
+                        </div>
+
+                        <!-- Preset Selector -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">성과 분야 및 프리셋</label>
+                            <select id="pressPresetSelect" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                <option value="preset-1">💊 [신약개발] 표적단백질분해(PROTAC) 혁신 항암신약 후보물질 도출</option>
+                                <option value="preset-2">🔬 [의료기기] AI 기반 초정밀 초음파 진단기기 식약처 3등급 허가 획득 지원</option>
+                                <option value="preset-3">🏭 [의약생산] 글로벌 cGMP 기준 무균 주사제 수탁생산 가동률 95% 달성</option>
+                                <option value="preset-4">🐁 [전임상] 중대동물(미니피그) 이용 심혈관 중재시술 스텐트 효능 검증</option>
+                                <option value="preset-5">🎓 [인재양성] 2026 글로벌 의료기기 규제과학(RA) 150명 전문과정 모집</option>
+                            </select>
+                        </div>
+
+                        <!-- Subject Title -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">핵심 제목 / 성과 주제 <span class="text-rose-500">*</span></label>
+                            <input id="pressSubject" type="text" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none" value="케이메디허브 신약개발지원센터, 표적단백질분해(PROTAC) 기술 적용 차세대 표적항암제 후보물질 도출 성공">
+                        </div>
+
+                        <!-- Department & Lead Researcher -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">주관 부서 / 센터</label>
+                                <input id="pressDept" type="text" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none" value="신약개발지원센터 표적치료연구팀">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">연구책임자 / 담당자</label>
+                                <input id="pressAuthor" type="text" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none" value="박정훈 수석연구원 (팀장)">
+                            </div>
+                        </div>
+
+                        <!-- Key Achievements & Impact -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">주요 R&D 성과 지표 및 핵심 데이터</label>
+                            <textarea id="pressDetails" rows="4" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none leading-relaxed" placeholder="성과 지표, 수치, 기존 기술 대비 개선점, 특허/논문 정보 등">- 기존 저해제 대비 암세포 사멸 효율 4.8배 향상
+- 정상 세포 독성 85% 이상 경감 확인 (in vitro/in vivo)
+- 국내 및 미국·유럽 핵심 물질특허 3건 출원 완료
+- 대구 첨복단지 입주 바이오벤처와의 공동 산학연 협업 성과</textarea>
+                        </div>
+
+                        <!-- Target Tone & Style -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">배포 채널 / 톤앤매너</label>
+                                <select id="pressTone" class="w-full text-xs border border-slate-300 rounded-lg p-2 bg-slate-50 focus:ring-2 focus:ring-emerald-500">
+                                    <option value="official">🏛️ 정부/공공기관 공식 발표체</option>
+                                    <option value="press">📰 일간지/경제지 언론 배포체</option>
+                                    <option value="trendy">🚀 바이오테크 혁신 브리핑체</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">해시태그 / 키워드 자동화</label>
+                                <input id="pressKeywords" type="text" class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500" value="케이메디허브, 표적항암제, PROTAC, 신약개발, 첨복단지">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Generation Button -->
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex flex-col space-y-2">
+                        <button id="generatePressBtn" type="button" class="w-full py-3 px-4 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-emerald-600 via-teal-700 to-blue-800 hover:opacity-95 shadow-lg shadow-emerald-700/20 flex items-center justify-center space-x-2 transition transform active:scale-[0.99]">
+                            <svg class="w-4 h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            <span>실시간 AI 보도자료 생성 (v14.0 엔진)</span>
+                        </button>
+                        <p class="text-[11px] text-center text-slate-400">보도자료 생성 후 즉시 카드뉴스로 변환할 수 있습니다.</p>
+                    </div>
+                </div>
+
+                <!-- Right Output Preview Panel -->
+                <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col">
+                    <!-- Top Output Bar -->
+                    <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+                        <div class="flex items-center space-x-2">
+                            <span class="px-2.5 py-1 text-xs font-bold bg-blue-50 text-blue-800 rounded-md border border-blue-100 flex items-center">
+                                <span class="w-1.5 h-1.5 rounded-full bg-blue-600 mr-1.5"></span>
+                                보도자료 배포본 미리보기
+                            </span>
+                            <span id="charCountSpan" class="text-xs text-slate-400">글자수: 1,248자 (공백 포함)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button id="copyPressBtn" type="button" class="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center space-x-1 transition">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                <span>전문 복사</span>
+                            </button>
+                            <button id="downloadPressTxtBtn" type="button" class="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center space-x-1 transition">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                <span>TXT 저장</span>
+                            </button>
+                            <button id="saveToArchiveBtn" type="button" class="px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg flex items-center space-x-1 transition">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                                <span>보관함 저장</span>
+                            </button>
+                            <button id="syncToCardNewsBtn" type="button" class="px-3 py-1.5 text-xs font-bold text-white bg-blue-700 hover:bg-blue-800 rounded-lg flex items-center space-x-1 transition">
+                                <span>카드뉴스로 변환 ➔</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Press Release Document Preview -->
+                    <div id="pressContentBox" class="flex-1 bg-slate-50/70 p-6 rounded-xl border border-slate-200/80 overflow-y-auto space-y-5 text-sm leading-relaxed text-slate-800 font-sans shadow-inner">
+                        <!-- Official Header Banner -->
+                        <div class="border-b-2 border-slate-300 pb-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-xs font-bold tracking-wider text-emerald-700 uppercase">K-MEDI HUB 보도자료</span>
+                                    <h1 id="outPressTitle" class="text-xl font-extrabold text-slate-900 mt-1 leading-snug">
+                                        케이메디허브, 차세대 표적항암 신약 후보물질 도출 성공… 기존 대비 암세포 사멸 4.8배 입증
+                                    </h1>
+                                    <p id="outPressSubtitle" class="text-xs text-slate-600 font-medium mt-1">
+                                        - 표적단백질분해(PROTAC) 기술 활용, 정상세포 독성 85% 대폭 경감<br>
+                                        - 첨단의료복합단지 산학연 연구생태계 지원을 통한 글로벌 신약 주권 확보 박차
+                                    </p>
+                                </div>
+                                <div class="text-right text-[11px] text-slate-500 space-y-0.5">
+                                    <p><strong class="text-slate-700">배포일시:</strong> 즉시 배포 가능</p>
+                                    <p><strong class="text-slate-700">담당부서:</strong> 신약개발지원센터</p>
+                                    <p><strong class="text-slate-700">문의:</strong> 053-790-5000</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Body Content Paragraphs -->
+                        <div id="outPressBody" class="space-y-4 text-[13.5px] text-slate-700 leading-7">
+                            <p>
+                                <strong>[대구=케이메디허브]</strong> 대구경북첨단의료산업진흥재단(이사장 양진영, 이하 케이메디허브) 신약개발지원센터가 혁신 표적단백질분해(PROTAC, Proteolysis Targeting Chimera) 플랫폼 기술을 활용하여 기존 치료제에 내성을 보이는 난치성 고형암을 표적하는 신약 후보물질 도출에 성공했다고 5일 밝혔다.
+                            </p>
+                            <p>
+                                이번 연구는 케이메디허브 신약개발지원센터 표적치료연구팀과 첨복단지 입주 바이오벤처가 공동으로 추진한 결과물로, 기존 저해제 방식의 약물 대비 암세포 사멸 유도 효율을 4.8배 이상 향상시키는 획기적인 연구 성과를 거두었다. 특히 정상 조직에 대한 비표적 독성을 85% 이상 억제함으로써 향후 임상 진입 시 약물 부작용을 현저히 낮출 수 있을 것으로 기대된다.
+                            </p>
+                            <div class="p-4 bg-white rounded-lg border-l-4 border-emerald-600 shadow-sm my-3">
+                                <p class="italic text-slate-800 font-medium">
+                                    “이번 후보물질 도출은 케이메디허브가 보유한 초정밀 분자모델링 기반 가상 스크리닝과 약효평가 원스톱 플랫폼이 빚어낸 결실입니다. 국내 바이오기업들이 글로벌 블록버스터 신약 파이프라인을 조기에 확보할 수 있도록 전주기 기술 지원을 아끼지 않겠습니다.”
+                                </p>
+                                <span class="block text-right text-xs text-slate-500 mt-2">— 신약개발지원센터 연구책임자</span>
+                            </div>
+                            <p>
+                                케이메디허브는 도출된 후보물질에 대해 국내 및 미국, 유럽 등 주요국 핵심 물질특허 3건의 출원을 완료하였으며, 재단 내 전임상센터 및 의약생산센터와의 유기적인 연계를 통해 비임상 유효성 검증과 임상시험용 시제품 생산까지 원스톱으로 지원할 계획이다.
+                            </p>
+                            <p>
+                                한편 케이메디허브는 국가 의료산업의 글로벌 경쟁력 강화를 위해 신약개발, 첨단의료기기, 전임상, 의약생산 등 의료산업 전주기 연구개발 및 사업화 인프라를 완비하고 국내 산·학·연·병 기관을 전방위로 지원하고 있다.
+                            </p>
+                        </div>
+
+                        <!-- Press Footer Information -->
+                        <div class="pt-4 border-t border-slate-200 text-xs text-slate-500 flex flex-wrap items-center justify-between gap-2">
+                            <div id="outPressKeywords" class="flex flex-wrap gap-1.5">
+                                <span class="bg-slate-200/70 text-slate-700 px-2 py-0.5 rounded text-[11px]">#케이메디허브</span>
+                                <span class="bg-slate-200/70 text-slate-700 px-2 py-0.5 rounded text-[11px]">#신약개발</span>
+                                <span class="bg-slate-200/70 text-slate-700 px-2 py-0.5 rounded text-[11px]">#PROTAC</span>
+                                <span class="bg-slate-200/70 text-slate-700 px-2 py-0.5 rounded text-[11px]">#첨단의료복합단지</span>
+                                <span class="bg-slate-200/70 text-slate-700 px-2 py-0.5 rounded text-[11px]">#의료R&D</span>
+                            </div>
+                            <span class="text-[11px] text-slate-400">케이메디허브 대외협력홍보팀 배포</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 2: 실시간 카드뉴스 스튜디오 (Interactive Canvas Studio) -->
+        <section id="tab-cardnews" class="tab-content p-6 space-y-6 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Edit Controls -->
+                <div class="lg:col-span-5 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center">
+                            <span class="w-2 h-2 rounded-full bg-blue-500 mr-2"></span>
+                            카드뉴스 실시간 편집기
+                        </h3>
+                        <span class="text-xs text-blue-600 font-semibold">1:1 규격 (1080x1080)</span>
+                    </div>
+
+                    <!-- Slide Selector Buttons -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-2">슬라이드 순서 선택</label>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button type="button" class="slide-nav-btn active py-2 px-1 text-center rounded-lg border-2 border-blue-600 bg-blue-50 text-blue-800 font-bold text-xs" data-slide="0">
+                                1. 메인 표지
+                            </button>
+                            <button type="button" class="slide-nav-btn py-2 px-1 text-center rounded-lg border border-slate-200 bg-white text-slate-600 font-medium text-xs hover:bg-slate-50" data-slide="1">
+                                2. 기술 배경
+                            </button>
+                            <button type="button" class="slide-nav-btn py-2 px-1 text-center rounded-lg border border-slate-200 bg-white text-slate-600 font-medium text-xs hover:bg-slate-50" data-slide="2">
+                                3. 핵심 성과
+                            </button>
+                            <button type="button" class="slide-nav-btn py-2 px-1 text-center rounded-lg border border-slate-200 bg-white text-slate-600 font-medium text-xs hover:bg-slate-50" data-slide="3">
+                                4. 향후 계획
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Theme Style Picker -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-2">디자인 테마 선택</label>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button type="button" class="theme-btn active p-2 rounded-lg border-2 border-emerald-500 flex flex-col items-center justify-center bg-slate-50" data-theme="kmedi-blue">
+                                <span class="w-6 h-6 rounded-full bg-gradient-to-tr from-[#0b2d6a] to-[#2e8b57] mb-1"></span>
+                                <span class="text-[10px] font-bold text-slate-700">K-메디블루</span>
+                            </button>
+                            <button type="button" class="theme-btn p-2 rounded-lg border border-slate-200 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100" data-theme="emerald">
+                                <span class="w-6 h-6 rounded-full bg-gradient-to-tr from-[#065f46] to-[#10b981] mb-1"></span>
+                                <span class="text-[10px] font-bold text-slate-700">바이오그린</span>
+                            </button>
+                            <button type="button" class="theme-btn p-2 rounded-lg border border-slate-200 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100" data-theme="purple">
+                                <span class="w-6 h-6 rounded-full bg-gradient-to-tr from-[#4c1d95] to-[#8b5cf6] mb-1"></span>
+                                <span class="text-[10px] font-bold text-slate-700">AI퍼플</span>
+                            </button>
+                            <button type="button" class="theme-btn p-2 rounded-lg border border-slate-200 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100" data-theme="dark">
+                                <span class="w-6 h-6 rounded-full bg-gradient-to-tr from-[#0f172a] to-[#334155] mb-1"></span>
+                                <span class="text-[10px] font-bold text-slate-700">모던다크</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Content Inputs for Active Slide -->
+                    <div class="space-y-3 pt-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">배지 문구 (Top Tag)</label>
+                            <input id="cardTagInput" type="text" class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500" value="K-MEDI HUB R&D HIGHLIGHT">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">슬라이드 헤드라인 (Title)</label>
+                            <textarea id="cardTitleInput" rows="2" class="w-full text-xs border border-slate-300 rounded-lg p-2 font-bold focus:ring-2 focus:ring-blue-500">차세대 표적항암 신약 후보물질 도출 성공</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">핵심 설명 (Description / Body)</label>
+                            <textarea id="cardBodyInput" rows="3" class="w-full text-xs border border-slate-300 rounded-lg p-2 leading-relaxed focus:ring-2 focus:ring-blue-500">PROTAC 기술 기반으로 암세포 사멸 4.8배 향상 및 정상조직 독성 85% 감소 달성! 케이메디허브와 함께하는 글로벌 신약 주권 확보</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">강조 수치 또는 통계 (Highlight Stat)</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input id="cardStatValue" type="text" class="text-xs border border-slate-300 rounded-lg p-2 font-bold text-emerald-600" value="4.8배 / 85%↓">
+                                <input id="cardStatLabel" type="text" class="text-xs border border-slate-300 rounded-lg p-2 text-slate-600" value="암세포 사멸 / 독성 경감">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Action Buttons -->
+                    <div class="pt-4 border-t border-slate-100 flex items-center space-x-2">
+                        <button id="renderCanvasBtn" type="button" class="flex-1 py-2.5 px-3 rounded-lg text-xs font-bold text-white bg-blue-700 hover:bg-blue-800 transition shadow">
+                            실시간 캔버스 재렌더링
+                        </button>
+                        <button id="downloadSlidePngBtn" type="button" class="flex-1 py-2.5 px-3 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition shadow flex items-center justify-center space-x-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            <span>PNG 다운로드</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Canvas Live Preview Area -->
+                <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center justify-center">
+                    <div class="w-full flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                            <span class="text-xs font-bold text-slate-800">실시간 스튜디오 캔버스 (Live Interactive Canvas)</span>
+                        </div>
+                        <span id="canvasSlideIndicator" class="text-xs font-semibold px-2 py-0.5 bg-slate-100 text-slate-600 rounded">Slide 1 / 4</span>
+                    </div>
+
+                    <!-- Canvas Box (Responsive scale) -->
+                    <div class="card-canvas-container relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 w-full max-w-[460px] aspect-square flex items-center justify-center">
+                        <canvas id="cardCanvas" width="1080" height="1080" class="w-full h-full object-contain cursor-pointer" title="클릭하면 PNG로 저장할 수 있습니다."></canvas>
+                    </div>
+
+                    <!-- Thumbnail Strip -->
+                    <div class="w-full max-w-[460px] mt-4 flex items-center justify-between gap-2">
+                        <div class="text-[11px] text-slate-500 font-medium">슬라이드 미리보기:</div>
+                        <div class="flex items-center space-x-2">
+                            <button type="button" class="thumb-btn px-2.5 py-1 text-xs font-bold rounded bg-blue-100 text-blue-800" data-thumb="0">1</button>
+                            <button type="button" class="thumb-btn px-2.5 py-1 text-xs font-medium rounded bg-slate-100 text-slate-600" data-thumb="1">2</button>
+                            <button type="button" class="thumb-btn px-2.5 py-1 text-xs font-medium rounded bg-slate-100 text-slate-600" data-thumb="2">3</button>
+                            <button type="button" class="thumb-btn px-2.5 py-1 text-xs font-medium rounded bg-slate-100 text-slate-600" data-thumb="3">4</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 3: 학술 포스터 & 초록 요약기 (Academic Poster & Abstract) -->
+        <section id="tab-poster" class="tab-content p-6 space-y-6 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Input Form -->
+                <div class="lg:col-span-5 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                    <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center">
+                            <span class="w-2 h-2 rounded-full bg-purple-500 mr-2"></span>
+                            연구 초록(Abstract) 및 논문 데이터 입력
+                        </h3>
+                        <span class="text-xs text-purple-600 font-semibold">SCI/KCI 포맷</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">연구 과제명 / 논문 제목</label>
+                        <input id="abstractTitleInput" type="text" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500" value="Development of Novel Targeted Protein Degraders for Refractory Solid Tumors via PROTAC Technology">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">연구 초록 원문 (Abstract / Summary)</label>
+                        <textarea id="abstractBodyInput" rows="6" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 leading-relaxed">Targeted protein degradation (PROTAC) represents a paradigm-shifting modality in oncological drug discovery. In this study, K-MEDI hub researchers successfully engineered a series of bifunctional PROTAC degraders targeting oncogenic driver proteins in therapy-resistant cancers. Using our integrated molecular docking and in vitro assay platform, lead compound KMH-802 exhibited potent degradation efficiency (DC50 = 3.2 nM) and suppressed tumor xenograft growth by 78.4% without systemic toxicity. This study demonstrates the preclinical feasibility of KMH-802 as a first-in-class clinical candidate.</textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">주요 키워드</label>
+                            <input id="abstractKeywordsInput" type="text" class="w-full text-xs border border-slate-300 rounded-lg p-2.5" value="PROTAC, KMH-802, Solid Tumor, DC50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">요약 타깃</label>
+                            <select id="abstractTargetSelect" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-slate-50">
+                                <option value="executive">경영진 / 정부 보고용 (3단 핵심)</option>
+                                <option value="poster">학술대회 포스터 초록용 (Structured)</option>
+                                <option value="b2b">바이오 기업 기술이전용 (Tech Summary)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button id="summarizeAbstractBtn" type="button" class="w-full py-3 px-4 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-purple-700 via-indigo-700 to-blue-800 hover:opacity-95 shadow-md flex items-center justify-center space-x-2 transition">
+                        <svg class="w-4 h-4 text-purple-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        <span>AI 3단 학술 요약 및 브리프 생성</span>
+                    </button>
+                </div>
+
+                <!-- Right Formatted Academic Brief -->
+                <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col">
+                    <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+                        <span class="text-xs font-bold text-purple-800 bg-purple-50 px-2.5 py-1 rounded-md border border-purple-200">
+                            학술 포스터 & 3단 요약 리포트
+                        </span>
+                        <button id="copyPosterSummaryBtn" type="button" class="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center space-x-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            <span>요약 복사</span>
+                        </button>
+                    </div>
+
+                    <div id="posterOutputBox" class="space-y-4 text-xs leading-relaxed text-slate-700">
+                        <div class="bg-purple-50/60 p-4 rounded-xl border border-purple-100">
+                            <span class="font-bold text-purple-900 text-sm block mb-1">📌 3줄 핵심 요약 (Executive Takeaways)</span>
+                            <ul class="list-disc list-inside space-y-1 text-slate-800">
+                                <li><strong>핵심 성과:</strong> 케이메디허브 신약개발지원센터, 난치성 고형암 표적 PROTAC 선도물질(KMH-802) 성공적 합성</li>
+                                <li><strong>정량 지표:</strong> 우수한 단백질 분해 효율(DC50 = 3.2 nM) 및 종양 동물모델 78.4% 성장 억제 달성</li>
+                                <li><strong>기대 효과:</strong> 전임상 독성 부재 확인, 국내 바이오벤처 기술이전 및 글로벌 IND 가속화</li>
+                            </ul>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-center">
+                                <span class="text-[10px] text-slate-500 font-semibold block">단백질 분해 효율</span>
+                                <span class="text-base font-extrabold text-purple-700">DC50 3.2 nM</span>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-center">
+                                <span class="text-[10px] text-slate-500 font-semibold block">종양 성장 억제율</span>
+                                <span class="text-base font-extrabold text-emerald-700">78.4% (in vivo)</span>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-center">
+                                <span class="text-[10px] text-slate-500 font-semibold block">독성 평가</span>
+                                <span class="text-base font-extrabold text-blue-700">Safe (No toxicity)</span>
+                            </div>
+                        </div>
+
+                        <div class="border border-slate-200 rounded-xl p-4 space-y-3">
+                            <h4 class="font-bold text-slate-900 text-xs">포스터 섹션 구성안 (Poster Layout Structure)</h4>
+                            <div class="space-y-2">
+                                <div class="p-2.5 bg-slate-50 rounded text-slate-800">
+                                    <strong class="text-purple-700">1. Background & Rationale:</strong> 기존 키나아제 억제제의 한계 극복을 위한 PROTAC 분해 메커니즘 도입 배경
+                                </div>
+                                <div class="p-2.5 bg-slate-50 rounded text-slate-800">
+                                    <strong class="text-purple-700">2. Methods & Screening:</strong> 케이메디허브 가상 스크리닝 및 웨스턴 블롯 기반 농도별 타깃 단백질 소멸 측정
+                                </div>
+                                <div class="p-2.5 bg-slate-50 rounded text-slate-800">
+                                    <strong class="text-purple-700">3. In Vivo Efficacy:</strong> 이종이식 마우스 모델에서의 투여 용량별 체중 및 종양 부피 추이
+                                </div>
+                                <div class="p-2.5 bg-slate-50 rounded text-slate-800">
+                                    <strong class="text-purple-700">4. Conclusion & K-MEDI Hub Role:</strong> 첨복단지 연구 인프라를 통한 임상 CDMO 파이프라인 연계 방안
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 4: 숏폼 & 영상 스크립트 (Video & Short-form) -->
+        <section id="tab-video" class="tab-content p-6 space-y-6 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Input Controls -->
+                <div class="lg:col-span-5 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                    <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center">
+                            <span class="w-2 h-2 rounded-full bg-rose-500 mr-2"></span>
+                            홍보 영상 및 숏폼 대본 기획
+                        </h3>
+                        <span class="text-xs text-rose-600 font-semibold">유튜브/릴스 규격</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">영상 주제</label>
+                        <input id="videoTopicInput" type="text" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-rose-500" value="암세포만 쏙 골라 없애는 신기술? 케이메디허브 항암 신약 연구 현장 급습!">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">영상 포맷</label>
+                            <select id="videoFormatSelect" class="w-full text-xs border border-slate-300 rounded-lg p-2 bg-slate-50">
+                                <option value="short-60">⏱️ 60초 숏폼 (YouTube Shorts/Reels)</option>
+                                <option value="short-30">⚡ 30초 초압축 쇼츠</option>
+                                <option value="promo-3m">🎬 3분 공식 기관 홍보 영상</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">진행 스타일</label>
+                            <select id="videoToneSelect" class="w-full text-xs border border-slate-300 rounded-lg p-2 bg-slate-50">
+                                <option value="energetic">🎉 재미있는 리포터 현장 취재형</option>
+                                <option value="docu">🎙️ 신뢰감 넘치는 다큐 내레이션</option>
+                                <option value="interview">👨‍🔬 연구원 1:1 인터뷰형</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">필수 노출 키워드 / 메시지</label>
+                        <textarea id="videoKeywordsInput" rows="3" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-rose-500">대구 첨단의료복합단지, 케이메디허브 신약개발지원센터, 암세포 사멸 4.8배, 국내 바이오 주권</textarea>
+                    </div>
+
+                    <button id="generateVideoScriptBtn" type="button" class="w-full py-3 px-4 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-rose-600 via-pink-600 to-purple-700 hover:opacity-95 shadow-md flex items-center justify-center space-x-2 transition">
+                        <svg class="w-4 h-4 text-rose-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        <span>씬(Scene)별 타임라인 대본 자동 생성</span>
+                    </button>
+                </div>
+
+                <!-- Right Video Script Timeline -->
+                <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col">
+                    <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+                        <span class="text-xs font-bold text-rose-800 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-200">
+                            60초 숏폼 타임라인 & 더빙 대본
+                        </span>
+                        <button id="copyVideoScriptBtn" type="button" class="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center space-x-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            <span>대본 전체 복사</span>
+                        </button>
+                    </div>
+
+                    <div id="videoScriptBox" class="space-y-3 overflow-y-auto max-h-[500px]">
+                        <!-- Scene 1 -->
+                        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col space-y-1.5">
+                            <div class="flex items-center justify-between text-[11px]">
+                                <span class="font-bold text-rose-600 bg-rose-100 px-2 py-0.5 rounded">Scene 1 (00:00 ~ 00:08) - 인트로 후킹</span>
+                                <span class="text-slate-400">화면비 9:16 세로형</span>
+                            </div>
+                            <div class="text-xs text-slate-800">
+                                <p><strong>[화면 연출]:</strong> 현미경을 들여다보는 연구원의 진지한 클로즈업 ➔ 빠르게 암세포가 사라지는 3D 모션 그래픽 전환</p>
+                                <p class="mt-1 text-slate-900 font-medium bg-white p-2 rounded border border-slate-200/80">
+                                    <strong>[자막 & 내레이션]:</strong> “암세포만 핀셋으로 집어내듯 분해하는 신기술이 있다면 믿으시겠습니까? 케이메디허브가 드디어 해냈습니다!”
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Scene 2 -->
+                        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col space-y-1.5">
+                            <div class="flex items-center justify-between text-[11px]">
+                                <span class="font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded">Scene 2 (00:08 ~ 00:25) - 핵심 기술 소개</span>
+                                <span class="text-slate-400">연구실 현장</span>
+                            </div>
+                            <div class="text-xs text-slate-800">
+                                <p><strong>[화면 연출]:</strong> 대구 첨복단지 연구실 전경 ➔ 연구책임자 인터뷰 및 PROTAC 분자 결합 시뮬레이션 화면</p>
+                                <p class="mt-1 text-slate-900 font-medium bg-white p-2 rounded border border-slate-200/80">
+                                    <strong>[자막 & 내레이션]:</strong> “기존 항암제보다 암세포 사멸 효과 무려 4.8배! 정상 세포의 부작용은 85%나 줄인 차세대 표적항암 신약 후보물질 도출 성공!”
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Scene 3 -->
+                        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col space-y-1.5">
+                            <div class="flex items-center justify-between text-[11px]">
+                                <span class="font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded">Scene 3 (00:25 ~ 00:48) - 인프라 및 신뢰도</span>
+                                <span class="text-slate-400">원스톱 인프라</span>
+                            </div>
+                            <div class="text-xs text-slate-800">
+                                <p><strong>[화면 연출]:</strong> 신약개발 ➔ 전임상 ➔ GMP 의약품 생산으로 이어지는 케이메디허브 센터 연계 인포그래픽 줌인</p>
+                                <p class="mt-1 text-slate-900 font-medium bg-white p-2 rounded border border-slate-200/80">
+                                    <strong>[자막 & 내레이션]:</strong> “국내 바이오 벤처가 꿈을 펼칠 수 있도록 신약 설계부터 시제품 생산까지 원스톱으로 지원하는 든든한 동반자, 케이메디허브!”
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Scene 4 -->
+                        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col space-y-1.5">
+                            <div class="flex items-center justify-between text-[11px]">
+                                <span class="font-bold text-purple-600 bg-purple-100 px-2 py-0.5 rounded">Scene 4 (00:48 ~ 01:00) - 아웃트로 CTA</span>
+                                <span class="text-slate-400">로고 & 공식채널</span>
+                            </div>
+                            <div class="text-xs text-slate-800">
+                                <p><strong>[화면 연출]:</strong> K-MEDI HUB 공식 로고와 슬로건 ‘대한민국 의료산업의 새로운 미래’ 노출, 홈페이지 QR코드</p>
+                                <p class="mt-1 text-slate-900 font-medium bg-white p-2 rounded border border-slate-200/80">
+                                    <strong>[자막 & 내레이션]:</strong> “대한민국 의료 신약의 미래, 케이메디허브와 함께 열어갑니다. 더 많은 연구 성과가 궁금하다면 지금 팔로우하세요!”
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 5: 콘텐츠 보관함 & 아카이브 (Archive & Export) -->
+        <section id="tab-archive" class="tab-content p-6 space-y-6 hidden">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base">콘텐츠 보관함 및 버전 관리 아카이브</h3>
+                        <p class="text-xs text-slate-500">스튜디오에서 생성된 모든 보도자료, 카드뉴스, 스크립트를 로컬에 안전하게 보관합니다.</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button id="exportArchiveJsonBtn" type="button" class="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center space-x-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            <span>JSON 내보내기</span>
+                        </button>
+                        <button id="clearArchiveBtn" type="button" class="px-3 py-1.5 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg">
+                            전체 비우기
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Archive List Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-700">
+                        <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold tracking-wider border-b border-slate-200">
+                            <tr>
+                                <th class="p-3">분류</th>
+                                <th class="p-3">콘텐츠 제목</th>
+                                <th class="p-3">담당 센터</th>
+                                <th class="p-3">생성 일시</th>
+                                <th class="p-3 text-right">작업</th>
+                            </tr>
+                        </thead>
+                        <tbody id="archiveTableBody" class="divide-y divide-slate-100">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast Notification Message -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 pointer-events-none bg-slate-900 text-white text-xs font-medium px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2 border border-slate-700">
+        <svg id="toastIcon" class="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <span id="toastMsg">작업이 완료되었습니다.</span>
+    </div>
+
+    <!-- Application Logic Script -->
+    <script>
+        (function() {
+            // Preset Data for K-MEDI HUB Centers
+            const PRESETS = {
+                'preset-1': {
+                    center: 'drug',
+                    subject: '케이메디허브 신약개발지원센터, 표적단백질분해(PROTAC) 기술 적용 차세대 표적항암제 후보물질 도출 성공',
+                    dept: '신약개발지원센터 표적치료연구팀',
+                    author: '박정훈 수석연구원 (팀장)',
+                    details: '- 기존 저해제 대비 암세포 사멸 효율 4.8배 향상\n- 정상 세포 독성 85% 이상 경감 확인 (in vitro/in vivo)\n- 국내 및 미국·유럽 핵심 물질특허 3건 출원 완료\n- 대구 첨복단지 입주 바이오벤처와의 공동 산학연 협업 성과',
+                    tone: 'official',
+                    keywords: '케이메디허브, 표적항암제, PROTAC, 신약개발, 첨복단지',
+                    cardSlides: [
+                        { tag: 'K-MEDI HUB R&D HIGHLIGHT', title: '차세대 표적항암 신약 후보물질 도출 성공', body: 'PROTAC 기술 기반으로 암세포 사멸 4.8배 향상 및 정상조직 독성 85% 감소 달성! 케이메디허브와 함께하는 글로벌 신약 주권 확보', statVal: '4.8배 / 85%↓', statLabel: '암세포 사멸 / 독성 경감' },
+                        { tag: 'TECHNOLOGY & INNOVATION', title: '기존 치료제의 한계를 넘는 혁신 플랫폼', body: '단순한 단백질 억제를 넘어 암 유발 단백질 자체를 분해하는 차세대 기술로 난치성 고형암 극복의 새로운 지평을 열었습니다.', statVal: 'DC50 3.2nM', statLabel: '초정밀 분해 효능' },
+                        { tag: 'CORE ACHIEVEMENTS', title: '국내외 핵심 특허 3건 출원 완료', body: '글로벌 진출을 위한 미국 및 유럽 물질특허 출원 완료! 첨복단지 바이오벤처와의 유기적 산학연 협력으로 R&D 시너지 극대화', statVal: '특허 3건 출원', statLabel: '글로벌 IP 선점' },
+                        { tag: 'FUTURE ROADMAP', title: '원스톱 전주기 지원으로 신약 상용화 가속', body: '신약개발에서 비임상, GMP 완제의약품 생산까지 케이메디허브의 원스톱 인프라가 대한민국 바이오 제약 생태계를 뒷받침합니다.', statVal: 'ONE-STOP', statLabel: '전주기 의료 지원' }
+                    ]
+                },
+                'preset-2': {
+                    center: 'device',
+                    subject: '케이메디허브 첨단의료기기개발지원센터, AI 초정밀 초음파 영상 진단 소프트웨어 식약처 3등급 인허가 획득 지원',
+                    dept: '첨단의료기기개발지원센터 디지털헬스연구팀',
+                    author: '이영진 책임연구원',
+                    details: '- AI 기반 심혈관 질환 영상 자동 측정 알고리즘 정확도 97.4% 달성\n- 공인시험평가 및 규제과학(RA) 맞춤형 기술지원으로 인허가 기간 6개월 단축\n- 국내 유망 의료기기 제조기업의 글로벌 시장 진출 토대 마련',
+                    tone: 'official',
+                    keywords: '케이메디허브, 의료기기, AI진단, 식약처3등급, 디지털헬스케어',
+                    cardSlides: [
+                        { tag: 'AI MEDICAL DEVICE', title: 'AI 초정밀 초음파 진단 SW 식약처 3등급 허가 획득', body: '케이메디허브 공인 시험평가 및 RA 컨설팅 지원을 통해 혁신 디지털 의료기기 인허가 기간 6개월 단축 달성!', statVal: '97.4% 정확도', statLabel: '식약처 3등급 허가' },
+                        { tag: 'DIGITAL HEALTHCARE', title: '심혈관 질환 1초 만에 자동 판독', body: '딥러닝 알고리즘으로 미세 병변까지 실시간 감지하여 의료진의 진단 효율성과 정확성을 획기적으로 개선합니다.', statVal: '1초 미만', statLabel: '실시간 판독 속도' },
+                        { tag: 'REGULATORY SUPPORT', title: 'RA 전문가 밀착 지원 및 공인시험 완료', body: '국제 규격에 부합하는 전기·기계적 안전성 및 소프트웨어 유효성 검증을 원스톱으로 지원하였습니다.', statVal: '-6개월', statLabel: '인허가 기간 단축' },
+                        { tag: 'GLOBAL EXPANSION', title: 'K-의료기기 글로벌 경쟁력 선도', body: '국내 기술로 완성된 혁신 의료기기가 미국 FDA 및 유럽 CE 인증으로 뻗어나갈 수 있도록 전방위 지원을 지속합니다.', statVal: 'GLOBAL', statLabel: '해외 시장 진출' }
+                    ]
+                },
+                'preset-3': {
+                    center: 'gmp',
+                    subject: '케이메디허브 의약생산센터, 글로벌 cGMP 충족 무균 주사제 수탁생산 가동률 95% 달성',
+                    dept: '의약생산센터 생산운영팀',
+                    author: '김상우 센터장',
+                    details: '- 중소·벤처 바이오기업 임상시험용 의약품 생산 38건 지원 완료\n- EU-GMP 및 cGMP 규격에 부합하는 최첨단 무균 충전 라인 가동\n- 자체 생산시설이 부족한 국내 신약 벤처의 든든한 생산 거점 역할 수행',
+                    tone: 'official',
+                    keywords: '케이메디허브, GMP, 의약생산, 주사제, CDMO, 바이오벤처',
+                    cardSlides: [
+                        { tag: 'GMP PRODUCTION', title: '무균 주사제 수탁 생산 가동률 95% 달성', body: '자체 공장이 없는 국내 유망 바이오벤처를 위해 최첨단 cGMP 시설에서 임상용 완제의약품을 안정적으로 공급합니다.', statVal: '95% 가동률', statLabel: '연간 38건 생산 지원' },
+                        { tag: 'QUALITY EXCELLENCE', title: '글로벌 스탠다드 cGMP 공정 시스템', body: '철저한 교차오염 방지 및 전공정 자동화 검사로 글로벌 규제당국의 실사 기준을 완벽히 충족합니다.', statVal: 'cGMP / EU-GMP', statLabel: '글로벌 무균 인증' },
+                        { tag: 'BIO INCUBATION', title: '국내 신약 벤처의 임상시험 조기 진입 견인', body: '고비용 설비 투자 부담 없이 고품질 시제품을 확보하여 국내 혁신 신약의 임상 진입 문턱을 대폭 낮췄습니다.', statVal: '40% 절감', statLabel: '개발 비용/시간 절감' },
+                        { tag: 'FUTURE FACTORY', title: '국가 바이오의약품 생산 인프라 허브', body: '항체 및 첨단 바이오의약품 생산 라인 고도화로 대한민국 메디컬 밸리의 핵심 제조 엔진으로 도약합니다.', statVal: 'HUB CDMO', statLabel: '공공 생산 인프라' }
+                    ]
+                },
+                'preset-4': {
+                    center: 'preclinical',
+                    subject: '케이메디허브 전임상센터, 중대동물(미니피그) 이용 차세대 심혈관 스텐트 유효성 및 생체적합성 검증 완료',
+                    dept: '전임상센터 동물실험지원팀',
+                    author: '최현석 팀장',
+                    details: '- 식약처 생체자원거점기관 공인 인프라 활용\n- 인체 혈관 구조와 유사한 미니피그 모델 6개월 추적 관찰 결과 재협착률 0% 확인\n- 인공지능 영상 분석 기법을 결합한 정밀 조직병리 평가 지원',
+                    tone: 'official',
+                    keywords: '케이메디허브, 전임상, 중대동물, 미니피그, 스텐트, 생체적합성',
+                    cardSlides: [
+                        { tag: 'PRECLINICAL RESEARCH', title: '미니피그 심혈관 스텐트 유효성 검증 성공', body: '인체와 가장 유사한 중대동물 모델을 활용하여 차세대 약물방출 스텐트의 장기 생체적합성을 입증하였습니다.', statVal: '0% 재협착', statLabel: '6개월 추적 결과' },
+                        { tag: 'ADVANCED FACILITY', title: '식약처 공인 생체자원 거점 인프라', body: '최첨단 수술실과 디지털 영상장비를 결합하여 글로벌 수준의 비임상 평가 데이터를 제공합니다.', statVal: 'K-GLP 규격', statLabel: '공인 시험 평가' },
+                        { tag: 'ACCURATE ANALYSIS', title: 'AI 기반 디지털 조직병리 분석 도입', body: '정밀 영상 데이터와 AI 조직 분석을 통해 스텐트 삽입 부위의 신내막 형성 억제를 과학적으로 입증했습니다.', statVal: 'High Precision', statLabel: '정밀 조직 분석' },
+                        { tag: 'TRUSTED PARTNER', title: '임상 실패 확률을 줄이는 믿음직한 전임상', body: '신뢰도 높은 전임상 데이터로 국내 의료기기 제조사의 임상 허가 성공률을 극대화합니다.', statVal: 'SUCCESS', statLabel: '임상 허가 가속' }
+                    ]
+                },
+                'preset-5': {
+                    center: 'training',
+                    subject: '케이메디허브, 2026년 하반기 글로벌 의료기기 규제과학(RA) 150명 전문인력 양성과정 교육생 모집',
+                    dept: '의료기술시험연수원 인재양성팀',
+                    author: '정다은 선임연구원',
+                    details: '- 미국 FDA, 유럽 MDR, 국내 MFDS 최신 인허가 실무 중심 집중 커리큘럼\n- 케이메디허브 실무 멘토링 및 의료기기 기업 취업 연계 프로그램 제공\n- 전액 국비 지원 및 수료자 채용 연계율 88% 기록',
+                    tone: 'official',
+                    keywords: '케이메디허브, 규제과학, RA전문가, 인재양성, 의료기술시험연수원',
+                    cardSlides: [
+                        { tag: 'TALENT ACADEMY', title: '2026 하반기 글로벌 의료기기 RA 전문가 양성', body: 'K-의료기기 산업의 핵심 브레인을 육성하는 케이메디허브 규제과학 전문과정 교육생을 모집합니다.', statVal: '150명 모집', statLabel: '전액 국비 지원' },
+                        { tag: 'PRACTICAL CURRICULUM', title: 'FDA · MDR · MFDS 최신 실무 완벽 정복', body: '단순 이론을 넘어 실제 기술문서 작성과 공인시험 데이터 해석 등 현장 즉시 투입형 실무 실습을 제공합니다.', statVal: '100% 실무형', statLabel: '글로벌 규제 대응' },
+                        { tag: 'CAREER CONNECT', title: '바이오·의료기기 우수 기업 1:1 취업 연계', body: '첨복단지 입주기업 및 국내 대표 헬스케어 기업들과의 채용설명회 및 멘토링 프로그램을 진행합니다.', statVal: '88% 취업률', statLabel: '수료생 채용 성과' },
+                        { tag: 'JOIN K-MEDI HUB', title: '미래 의료산업을 이끌 당신을 기다립니다', body: '케이메디허브 의료기술시험연수원의 첨단 인프라에서 글로벌 헬스케어 리더로 성장하세요!', statVal: 'NOW APPLY', statLabel: '홈페이지 접수 중' }
+                    ]
+                }
+            };
+
+            // Initial State
+            let currentTab = 'tab-press';
+            let currentPresetKey = 'preset-1';
+            let activeSlideIndex = 0;
+            let currentTheme = 'kmedi-blue';
+            let slidesData = JSON.parse(JSON.stringify(PRESETS['preset-1'].cardSlides));
+
+            // Default Archives
+            let archiveList = [
+                {
+                    id: 'arch-1',
+                    category: '보도자료',
+                    title: '차세대 표적항암 신약 후보물질 도출 성공',
+                    dept: '신약개발지원센터',
+                    date: '2026-11-05 14:20',
+                    presetKey: 'preset-1'
+                },
+                {
+                    id: 'arch-2',
+                    category: '카드뉴스',
+                    title: 'AI 초정밀 초음파 진단 SW 식약처 3등급 허가 획득',
+                    dept: '첨단의료기기개발지원센터',
+                    date: '2026-11-04 11:15',
+                    presetKey: 'preset-2'
+                },
+                {
+                    id: 'arch-3',
+                    category: '영상대본',
+                    title: '무균 주사제 수탁 생산 가동률 95% 달성',
+                    dept: '의약생산센터',
+                    date: '2026-11-03 16:45',
+                    presetKey: 'preset-3'
+                }
+            ];
+
+            // LocalStorage Load if available
+            try {
+                const stored = localStorage.getItem('kmedi_archive_v14');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        archiveList = parsed;
+                    }
+                }
+            } catch(e) {
+                console.log('localStorage read fallback');
+            }
+
+            // Save to localStorage helper
+            function saveArchiveStorage() {
+                try {
+                    localStorage.setItem('kmedi_archive_v14', JSON.stringify(archiveList));
+                } catch(e) {
+                    console.log('localStorage write fallback');
+                }
+                renderArchiveTable();
+            }
+
+            // Toast Notification
+            function showToast(msg) {
+                const toast = document.getElementById('toast');
+                const toastMsg = document.getElementById('toastMsg');
+                toastMsg.textContent = msg;
+                toast.classList.remove('opacity-0', 'translate-y-20', 'pointer-events-none');
+                toast.classList.add('opacity-100', 'translate-y-0');
+                setTimeout(() => {
+                    toast.classList.remove('opacity-100', 'translate-y-0');
+                    toast.classList.add('opacity-0', 'translate-y-20', 'pointer-events-none');
+                }, 2800);
+            }
+
+            // Tab Switching
+            const navItems = document.querySelectorAll('.nav-item');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const pageTitle = document.getElementById('pageTitle');
+            const pageSubtitle = document.getElementById('pageSubtitle');
+            const pageIcon = document.getElementById('pageIcon');
+
+            const TAB_META = {
+                'tab-press': {
+                    title: 'AI 보도자료 & 성과 기사 생성기',
+                    sub: '연구개발 및 사업 성과 데이터를 표준 공공기관 보도자료 규격으로 즉시 생성합니다.',
+                    icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>'
+                },
+                'tab-cardnews': {
+                    title: '실시간 카드뉴스 스튜디오 (HTML5 Canvas)',
+                    sub: '소셜 미디어 및 언론 홍보용 고품질 카드뉴스를 실시간으로 편집하고 PNG로 내보냅니다.',
+                    icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>'
+                },
+                'tab-poster': {
+                    title: '학술 포스터 & 연구 초록 요약기',
+                    sub: 'SCI/KCI급 논문 초록과 연구 제안서를 한눈에 파악할 수 있는 3단 브리프로 가공합니다.',
+                    icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>'
+                },
+                'tab-video': {
+                    title: '숏폼 & 홍보 영상 시나리오 생성기',
+                    sub: '유튜브 숏츠, 릴스, 공식 홍보영상을 위한 초단위 씬별 연출/자막/내레이션 대본을 제작합니다.',
+                    icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>'
+                },
+                'tab-archive': {
+                    title: '콘텐츠 보관함 & 아카이브',
+                    sub: '생성된 모든 콘텐츠를 확인하고 이전 작업을 스튜디오로 즉시 다시 불러옵니다.',
+                    icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>'
+                }
+            };
+
+            function switchTab(targetTabId) {
+                currentTab = targetTabId;
+                navItems.forEach(item => {
+                    if (item.getAttribute('data-tab') === targetTabId) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+
+                tabContents.forEach(content => {
+                    if (content.id === targetTabId) {
+                        content.classList.remove('hidden');
+                    } else {
+                        content.classList.add('hidden');
+                    }
+                });
+
+                const meta = TAB_META[targetTabId];
+                if (meta) {
+                    pageTitle.textContent = meta.title;
+                    pageSubtitle.textContent = meta.sub;
+                    pageIcon.innerHTML = meta.icon;
+                }
+
+                if (targetTabId === 'tab-cardnews') {
+                    renderCanvas();
+                }
+            }
+
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const target = this.getAttribute('data-tab');
+                    switchTab(target);
+                    // Close mobile sidebar if open
+                    const sidebar = document.getElementById('sidebar');
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.add('hidden');
+                    }
+                });
+            });
+
+            // Mobile Menu Toggle
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            mobileMenuBtn.addEventListener('click', function() {
+                const sidebar = document.getElementById('sidebar');
+                sidebar.classList.toggle('hidden');
+            });
+
+            // Center Selector
+            const centerSelector = document.getElementById('centerSelector');
+            centerSelector.addEventListener('change', function() {
+                const val = this.value;
+                let matchedPreset = 'preset-1';
+                if (val === 'device') matchedPreset = 'preset-2';
+                else if (val === 'gmp') matchedPreset = 'preset-3';
+                else if (val === 'preclinical') matchedPreset = 'preset-4';
+                else if (val === 'training') matchedPreset = 'preset-5';
+
+                document.getElementById('pressPresetSelect').value = matchedPreset;
+                loadPreset(matchedPreset);
+                showToast('센터 기준 데이터셋이 로드되었습니다.');
+            });
+
+            // Load Preset Function
+            function loadPreset(presetKey) {
+                currentPresetKey = presetKey;
+                const p = PRESETS[presetKey];
+                if (!p) return;
+
+                document.getElementById('pressSubject').value = p.subject;
+                document.getElementById('pressDept').value = p.dept;
+                document.getElementById('pressAuthor').value = p.author;
+                document.getElementById('pressDetails').value = p.details.replace(/\n/g, '\n');
+                document.getElementById('pressTone').value = p.tone;
+                document.getElementById('pressKeywords').value = p.keywords;
+
+                slidesData = JSON.parse(JSON.stringify(p.cardSlides));
+                loadSlideInputs(activeSlideIndex);
+                generatePressRelease();
+            }
+
+            document.getElementById('pressPresetSelect').addEventListener('change', function() {
+                loadPreset(this.value);
+            });
+
+            document.getElementById('quickPresetBtn').addEventListener('click', function() {
+                const keys = ['preset-1', 'preset-2', 'preset-3', 'preset-4', 'preset-5'];
+                const currentIdx = keys.indexOf(currentPresetKey);
+                const nextKey = keys[(currentIdx + 1) % keys.length];
+                document.getElementById('pressPresetSelect').value = nextKey;
+                loadPreset(nextKey);
+                showToast('다음 추천 예시를 불러왔습니다.');
+            });
+
+            document.getElementById('resetFormBtn').addEventListener('click', function() {
+                loadPreset('preset-1');
+                showToast('기본값으로 초기화되었습니다.');
+            });
+
+            // Generate Press Release
+            function generatePressRelease() {
+                const subject = document.getElementById('pressSubject').value.trim();
+                const dept = document.getElementById('pressDept').value.trim();
+                const author = document.getElementById('pressAuthor').value.trim();
+                const details = document.getElementById('pressDetails').value.trim();
+                const keywords = document.getElementById('pressKeywords').value.trim();
+
+                const outTitle = document.getElementById('outPressTitle');
+                const outSubtitle = document.getElementById('outPressSubtitle');
+                const outBody = document.getElementById('outPressBody');
+                const outKeywords = document.getElementById('outPressKeywords');
+
+                outTitle.textContent = subject || '케이메디허브 혁신 의료 R&D 성과 발표';
+                outSubtitle.innerHTML = `- ${dept} 주관 핵심 성과 달성 및 특허 출원<br>- 첨단의료복합단지 산학연 연구생태계 지원을 통한 국가 의료 경쟁력 제고`;
+
+                // Split details into bullets
+                const detailLines = details.split('\n').filter(l => l.trim().length > 0);
+                const detailBullets = detailLines.map(l => l.replace(/^[\-\•\*]\s*/, '')).join(' · ');
+
+                outBody.innerHTML = `
+                    <p><strong>[대구=케이메디허브]</strong> 대구경북첨단의료산업진흥재단(이사장 양진영, 이하 케이메디허브) ${dept}가 국가 의료산업 경쟁력 강화를 위한 집중 연구를 통해 <strong>‘${subject}’</strong>의 괄목할 만한 성과를 거두었다고 5일 밝혔다.</p>
+                    <p>이번 프로젝트는 재단 내 전주기 첨단 인프라를 바탕으로 산·학·연·병 긴밀한 협력을 통해 진행되었으며, 주요 성과 지표로 <em>[${detailBullets}]</em> 등을 성공적으로 입증하였다.</p>
+                    <div class="p-4 bg-white rounded-lg border-l-4 border-emerald-600 shadow-sm my-3">
+                        <p class="italic text-slate-800 font-medium">“이번 결실은 케이메디허브가 축적해 온 첨단 분석·평가 인프라와 연구진의 헌신이 어우러진 결과입니다. 앞으로도 국내 바이오·의료 기업들이 글로벌 시장으로 도약할 수 있도록 실질적 지원을 아끼지 않겠습니다.”</p>
+                        <span class="block text-right text-xs text-slate-500 mt-2">— ${author}</span>
+                    </div>
+                    <p>케이메디허브는 도출된 성과에 대해 지식재산권 확보 및 국내외 인허가 검증을 신속히 추진할 예정이며, 재단 내 유관 센터(신약개발·의료기기·전임상·의약생산)와의 긴밀한 연계를 통해 상용화 가속화를 전폭 지원한다.</p>
+                    <p>한편, 케이메디허브는 대구경북첨단의료복합단지를 거점으로 글로벌 신약 개발 및 첨단 의료기기 산업 육성을 위한 공공 R&D 플랫폼으로서 대한민국 의료기술 혁신의 중추 역할을 다하고 있다.</p>
+                `;
+
+                // Update Keywords
+                const kwList = keywords.split(',').map(k => k.trim()).filter(Boolean);
+                outKeywords.innerHTML = kwList.map(k => `<span class="bg-slate-200/70 text-slate-700 px-2 py-0.5 rounded text-[11px]">#${k}</span>`).join(' ');
+
+                // Update Char Count
+                const fullText = outTitle.textContent + ' ' + outBody.textContent;
+                document.getElementById('charCountSpan').textContent = `글자수: ${fullText.length.toLocaleString()}자 (공백 포함)`;
+            }
+
+            document.getElementById('generatePressBtn').addEventListener('click', function() {
+                generatePressRelease();
+                showToast('v14.0 엔진으로 보도자료가 실시간 생성되었습니다.');
+            });
+
+            // Copy Helper with Fallback
+            function copyToClipboard(text, successMsg) {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        showToast(successMsg || '클립보드에 복사되었습니다.');
+                    }).catch(() => {
+                        fallbackCopy(text, successMsg);
+                    });
+                } else {
+                    fallbackCopy(text, successMsg);
+                }
+            }
+
+            function fallbackCopy(text, successMsg) {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                try {
+                    document.execCommand('copy');
+                    showToast(successMsg || '클립보드에 복사되었습니다.');
+                } catch(e) {
+                    showToast('복사에 실패했습니다. 수동으로 복사해주세요.');
+                }
+                document.body.removeChild(ta);
+            }
+
+            // Copy Press
+            document.getElementById('copyPressBtn').addEventListener('click', function() {
+                const title = document.getElementById('outPressTitle').innerText;
+                const sub = document.getElementById('outPressSubtitle').innerText;
+                const body = document.getElementById('outPressBody').innerText;
+                const full = `[보도자료]\n${title}\n\n${sub}\n\n${body}\n\n[케이메디허브 K-MEDI HUB 배포]`;
+                copyToClipboard(full, '보도자료 전문이 클립보드에 복사되었습니다.');
+            });
+
+            // Download Press TXT
+            document.getElementById('downloadPressTxtBtn').addEventListener('click', function() {
+                const title = document.getElementById('outPressTitle').innerText;
+                const sub = document.getElementById('outPressSubtitle').innerText;
+                const body = document.getElementById('outPressBody').innerText;
+                const full = `[보도자료] ${title}\n\n${sub}\n\n${body}\n\n대구경북첨단의료산업진흥재단 (K-MEDI HUB)`;
+                
+                const blob = new Blob([full], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `K-MEDI_HUB_보도자료_${new Date().toISOString().slice(0,10)}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('보도자료 TXT 파일이 다운로드되었습니다.');
+            });
+
+            // Sync to Card News
+            document.getElementById('syncToCardNewsBtn').addEventListener('click', function() {
+                const subject = document.getElementById('pressSubject').value.trim();
+                const details = document.getElementById('pressDetails').value.trim();
+
+                slidesData[0].title = subject.length > 32 ? subject.slice(0, 30) + '...' : subject;
+                slidesData[0].body = details.split('\n')[0].replace(/^[\-\•\*]\s*/, '') || slidesData[0].body;
+
+                loadSlideInputs(0);
+                switchTab('tab-cardnews');
+                showToast('보도자료 내용이 카드뉴스 1번 슬라이드에 동기화되었습니다.');
+            });
+
+            // Save to Archive
+            document.getElementById('saveToArchiveBtn').addEventListener('click', function() {
+                const title = document.getElementById('outPressTitle').innerText;
+                const dept = document.getElementById('pressDept').value.trim();
+                const newArch = {
+                    id: 'arch-' + Date.now(),
+                    category: '보도자료',
+                    title: title.slice(0, 45) + (title.length > 45 ? '...' : ''),
+                    dept: dept,
+                    date: new Date().toISOString().replace('T', ' ').slice(0, 16),
+                    presetKey: currentPresetKey
+                };
+                archiveList.unshift(newArch);
+                saveArchiveStorage();
+                showToast('콘텐츠 보관함에 안전하게 저장되었습니다.');
+            });
+
+            // --- Card News Studio (Canvas Engine) ---
+            const cardCanvas = document.getElementById('cardCanvas');
+            const ctx = cardCanvas.getContext('2d');
+
+            function loadSlideInputs(index) {
+                activeSlideIndex = index;
+                const slide = slidesData[index] || slidesData[0];
+                document.getElementById('cardTagInput').value = slide.tag;
+                document.getElementById('cardTitleInput').value = slide.title;
+                document.getElementById('cardBodyInput').value = slide.body;
+                document.getElementById('cardStatValue').value = slide.statVal;
+                document.getElementById('cardStatLabel').value = slide.statLabel;
+
+                document.getElementById('canvasSlideIndicator').textContent = `Slide ${index + 1} / 4`;
+
+                document.querySelectorAll('.slide-nav-btn').forEach(btn => {
+                    if (parseInt(btn.getAttribute('data-slide'), 10) === index) {
+                        btn.classList.add('active', 'border-blue-600', 'bg-blue-50', 'text-blue-800', 'font-bold');
+                        btn.classList.remove('border-slate-200', 'bg-white', 'text-slate-600');
+                    } else {
+                        btn.classList.remove('active', 'border-blue-600', 'bg-blue-50', 'text-blue-800', 'font-bold');
+                        btn.classList.add('border-slate-200', 'bg-white', 'text-slate-600');
+                    }
+                });
+
+                document.querySelectorAll('.thumb-btn').forEach(btn => {
+                    if (parseInt(btn.getAttribute('data-thumb'), 10) === index) {
+                        btn.classList.add('bg-blue-100', 'text-blue-800', 'font-bold');
+                        btn.classList.remove('bg-slate-100', 'text-slate-600');
+                    } else {
+                        btn.classList.remove('bg-blue-100', 'text-blue-800', 'font-bold');
+                        btn.classList.add('bg-slate-100', 'text-slate-600');
+                    }
+                });
+
+                renderCanvas();
+            }
+
+            // Slide Nav Click
+            document.querySelectorAll('.slide-nav-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const idx = parseInt(this.getAttribute('data-slide'), 10);
+                    loadSlideInputs(idx);
+                });
+            });
+
+            document.querySelectorAll('.thumb-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const idx = parseInt(this.getAttribute('data-thumb'), 10);
+                    loadSlideInputs(idx);
+                });
+            });
+
+            // Update Current Slide Data on typing
+            function updateCurrentSlideFromInputs() {
+                if (!slidesData[activeSlideIndex]) return;
+                slidesData[activeSlideIndex].tag = document.getElementById('cardTagInput').value;
+                slidesData[activeSlideIndex].title = document.getElementById('cardTitleInput').value;
+                slidesData[activeSlideIndex].body = document.getElementById('cardBodyInput').value;
+                slidesData[activeSlideIndex].statVal = document.getElementById('cardStatValue').value;
+                slidesData[activeSlideIndex].statLabel = document.getElementById('cardStatLabel').value;
+                renderCanvas();
+            }
+
+            document.getElementById('cardTagInput').addEventListener('input', updateCurrentSlideFromInputs);
+            document.getElementById('cardTitleInput').addEventListener('input', updateCurrentSlideFromInputs);
+            document.getElementById('cardBodyInput').addEventListener('input', updateCurrentSlideFromInputs);
+            document.getElementById('cardStatValue').addEventListener('input', updateCurrentSlideFromInputs);
+            document.getElementById('cardStatLabel').addEventListener('input', updateCurrentSlideFromInputs);
+
+            // Theme Buttons
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.theme-btn').forEach(b => {
+                        b.classList.remove('active', 'border-emerald-500', 'border-2');
+                        b.classList.add('border', 'border-slate-200');
+                    });
+                    this.classList.add('active', 'border-emerald-500', 'border-2');
+                    this.classList.remove('border-slate-200');
+
+                    currentTheme = this.getAttribute('data-theme');
+                    renderCanvas();
+                    showToast(`디자인 테마가 [${currentTheme}]로 변경되었습니다.`);
+                });
+            });
+
+            // Real-time Canvas Rendering
+            function renderCanvas() {
+                const width = 1080;
+                const height = 1080;
+                ctx.clearRect(0, 0, width, height);
+
+                const slide = slidesData[activeSlideIndex] || slidesData[0];
+
+                // Theme Palette Config
+                let bgGradStart = '#0b192c';
+                let bgGradEnd = '#0b2d6a';
+                let accentColor = '#10b981';
+                let secondaryColor = '#38bdf8';
+                let cardFill = 'rgba(255, 255, 255, 0.06)';
+                let cardBorder = 'rgba(255, 255, 255, 0.12)';
+
+                if (currentTheme === 'emerald') {
+                    bgGradStart = '#064e3b';
+                    bgGradEnd = '#022c22';
+                    accentColor = '#34d399';
+                    secondaryColor = '#6ee7b7';
+                } else if (currentTheme === 'purple') {
+                    bgGradStart = '#2e1065';
+                    bgGradEnd = '#0f172a';
+                    accentColor = '#a855f7';
+                    secondaryColor = '#c084fc';
+                } else if (currentTheme === 'dark') {
+                    bgGradStart = '#090d16';
+                    bgGradEnd = '#1e293b';
+                    accentColor = '#f59e0b';
+                    secondaryColor = '#38bdf8';
+                }
+
+                // 1. Draw Background Gradient
+                const grad = ctx.createLinearGradient(0, 0, width, height);
+                grad.addColorStop(0, bgGradStart);
+                grad.addColorStop(1, bgGradEnd);
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, width, height);
+
+                // 2. Decorative Modern Tech Circles & Curves
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(width - 100, 150, 320, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(150, height - 120, 240, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+                ctx.fill();
+
+                // Decorative grid pattern
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+                ctx.lineWidth = 1;
+                for (let x = 80; x < width; x += 100) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, height);
+                    ctx.stroke();
+                }
+                ctx.restore();
+
+                // 3. Top Header Brand Bar
+                // Logo Icon
+                ctx.save();
+                ctx.fillStyle = accentColor;
+                roundRect(ctx, 80, 80, 56, 56, 14, true, false);
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '900 32px Pretendard, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('K', 108, 108);
+
+                // Logo Text
+                ctx.textAlign = 'left';
+                ctx.font = '900 34px Pretendard, sans-serif';
+                ctx.fillText('K-MEDI HUB', 152, 100);
+
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '600 18px Pretendard, sans-serif';
+                ctx.fillText('대구경북첨단의료산업진흥재단', 154, 126);
+
+                // Slide Index Indicator at top right
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                roundRect(ctx, width - 180, 80, 100, 46, 23, true, false);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '700 20px Pretendard, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`0${activeSlideIndex + 1} / 04`, width - 130, 104);
+                ctx.restore();
+
+                // 4. Tag Badge
+                ctx.save();
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+                ctx.strokeStyle = accentColor;
+                ctx.lineWidth = 1.5;
+                roundRect(ctx, 80, 200, 360, 48, 24, true, true);
+
+                ctx.fillStyle = accentColor;
+                ctx.font = '800 18px Pretendard, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(slide.tag || 'K-MEDI HUB R&D HIGHLIGHT', 108, 224);
+                ctx.restore();
+
+                // 5. Main Title (Wrapped)
+                ctx.save();
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '800 54px Pretendard, sans-serif';
+                ctx.textBaseline = 'top';
+                ctx.textAlign = 'left';
+                const titleY = wrapText(ctx, slide.title, 80, 280, 920, 72, 3);
+                ctx.restore();
+
+                // 6. Highlight Stat Card Box
+                const statBoxY = titleY + 36;
+                ctx.save();
+                ctx.fillStyle = cardFill;
+                ctx.strokeStyle = cardBorder;
+                ctx.lineWidth = 2;
+                roundRect(ctx, 80, statBoxY, 920, 160, 24, true, true);
+
+                // Accent Line
+                ctx.fillStyle = accentColor;
+                roundRect(ctx, 80, statBoxY, 8, 160, { tl: 24, bl: 24, tr: 0, br: 0 }, true, false);
+
+                // Stat Value
+                ctx.fillStyle = accentColor;
+                ctx.font = '900 48px Pretendard, sans-serif';
+                ctx.textBaseline = 'middle';
+                ctx.textAlign = 'left';
+                ctx.fillText(slide.statVal || 'KEY METRIC', 120, statBoxY + 60);
+
+                // Stat Label
+                ctx.fillStyle = '#cbd5e1';
+                ctx.font = '600 22px Pretendard, sans-serif';
+                ctx.fillText(slide.statLabel || '성과 지표', 122, statBoxY + 115);
+                ctx.restore();
+
+                // 7. Body Text (Wrapped)
+                const bodyY = statBoxY + 200;
+                ctx.save();
+                ctx.fillStyle = '#e2e8f0';
+                ctx.font = '500 28px Pretendard, sans-serif';
+                ctx.textBaseline = 'top';
+                ctx.textAlign = 'left';
+                wrapText(ctx, slide.body, 80, bodyY, 920, 44, 4);
+                ctx.restore();
+
+                // 8. Bottom Footer Bar
+                ctx.save();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(80, height - 120);
+                ctx.lineTo(width - 80, height - 120);
+                ctx.stroke();
+
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '600 18px Pretendard, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('대한민국 의료산업의 미래를 선도하는 글로벌 바이오 메디컬 허브', 80, height - 70);
+
+                ctx.fillStyle = secondaryColor;
+                ctx.font = '700 18px Pretendard, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText('www.kmedihub.re.kr', width - 80, height - 70);
+                ctx.restore();
+            }
+
+            // Canvas Text Wrap Helper
+            function wrapText(context, text, x, y, maxWidth, lineHeight, maxLines) {
+                const words = text.split(' ');
+                let line = '';
+                let lineCount = 0;
+                let currentY = y;
+
+                for (let n = 0; n < words.length; n++) {
+                    const testLine = line + words[n] + ' ';
+                    const metrics = context.measureText(testLine);
+                    const testWidth = metrics.width;
+                    if (testWidth > maxWidth && n > 0) {
+                        context.fillText(line, x, currentY);
+                        line = words[n] + ' ';
+                        currentY += lineHeight;
+                        lineCount++;
+                        if (maxLines && lineCount >= maxLines - 1) {
+                            // truncate remaining with ellipsis
+                            const remaining = words.slice(n).join(' ');
+                            let fitLine = remaining;
+                            while (context.measureText(fitLine + '...').width > maxWidth && fitLine.length > 0) {
+                                fitLine = fitLine.slice(0, -1);
+                            }
+                            context.fillText(fitLine + '...', x, currentY);
+                            return currentY + lineHeight;
+                        }
+                    } else {
+                        line = testLine;
+                    }
+                }
+                context.fillText(line, x, currentY);
+                return currentY + lineHeight;
+            }
+
+            // Canvas Rounded Rect Helper
+            function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+                if (typeof radius === 'undefined') radius = 5;
+                if (typeof radius === 'number') {
+                    radius = { tl: radius, tr: radius, br: radius, bl: radius };
+                } else {
+                    const defaultRadius = { tl: 0, tr: 0, br: 0, bl: 0 };
+                    for (let side in defaultRadius) {
+                        radius[side] = radius[side] || defaultRadius[side];
+                    }
+                }
+                ctx.beginPath();
+                ctx.moveTo(x + radius.tl, y);
+                ctx.lineTo(x + width - radius.tr, y);
+                ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+                ctx.lineTo(x + width, y + height - radius.br);
+                ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+                ctx.lineTo(x + radius.bl, y + height);
+                ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+                ctx.lineTo(x, y + radius.tl);
+                ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+                ctx.closePath();
+                if (fill) ctx.fill();
+                if (stroke) ctx.stroke();
+            }
+
+            // Render Canvas Button
+            document.getElementById('renderCanvasBtn').addEventListener('click', function() {
+                renderCanvas();
+                showToast('캔버스가 새로고침되었습니다.');
+            });
+
+            // Download Canvas PNG
+            function downloadCurrentCanvas() {
+                try {
+                    const dataUrl = cardCanvas.toDataURL('image/png');
+                    const a = document.createElement('a');
+                    a.href = dataUrl;
+                    a.download = `K-MEDI_HUB_카드뉴스_슬라이드${activeSlideIndex + 1}_${Date.now()}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    showToast(`슬라이드 ${activeSlideIndex + 1} PNG 이미지가 저장되었습니다.`);
+                } catch(e) {
+                    showToast('이미지 다운로드 중 오류가 발생했습니다.');
+                }
+            }
+
+            document.getElementById('downloadSlidePngBtn').addEventListener('click', downloadCurrentCanvas);
+            cardCanvas.addEventListener('click', downloadCurrentCanvas);
+
+            // --- Academic Poster Summary Tab ---
+            document.getElementById('summarizeAbstractBtn').addEventListener('click', function() {
+                const title = document.getElementById('abstractTitleInput').value.trim();
+                const target = document.getElementById('abstractTargetSelect').value;
+                const outputBox = document.getElementById('posterOutputBox');
+
+                outputBox.innerHTML = `
+                    <div class="bg-purple-50/60 p-4 rounded-xl border border-purple-100">
+                        <span class="font-bold text-purple-900 text-sm block mb-1">📌 3줄 핵심 요약 (${target === 'executive' ? '경영진/정부 보고용' : '학술 포스터용'})</span>
+                        <ul class="list-disc list-inside space-y-1 text-slate-800">
+                            <li><strong>연구 과제:</strong> ${title || 'PROTAC 기반 난치성 고형암 표적 신약 연구'}</li>
+                            <li><strong>핵심 성과:</strong> 분자 결합 가상 스크리닝을 통해 DC50 = 3.2 nM 수준의 고효능 선도물질(KMH-802) 성공적 도출</li>
+                            <li><strong>실증 검증:</strong> 종양 마우스 모델에서 78.4% 성장 억제 및 중대 전신독성 0건 검증 완료</li>
+                        </ul>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-center">
+                            <span class="text-[10px] text-slate-500 font-semibold block">단백질 분해 효율</span>
+                            <span class="text-base font-extrabold text-purple-700">DC50 3.2 nM</span>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-center">
+                            <span class="text-[10px] text-slate-500 font-semibold block">종양 억제율</span>
+                            <span class="text-base font-extrabold text-emerald-700">78.4% (in vivo)</span>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-center">
+                            <span class="text-[10px] text-slate-500 font-semibold block">안전성 지표</span>
+                            <span class="text-base font-extrabold text-blue-700">No Toxicity</span>
+                        </div>
+                    </div>
+
+                    <div class="border border-slate-200 rounded-xl p-4 space-y-3">
+                        <h4 class="font-bold text-slate-900 text-xs">학술 포스터 배치 가이드 (Poster Panel Guide)</h4>
+                        <div class="space-y-2">
+                            <div class="p-2.5 bg-slate-50 rounded text-slate-800">
+                                <strong class="text-purple-700">Panel 1:</strong> Introduction - 치료 내성 고형암의 의학적 미충족 수요 및 분해 표적 선정 타당성
+                            </div>
+                            <div class="p-2.5 bg-slate-50 rounded text-slate-800">
+                                <strong class="text-purple-700">Panel 2:</strong> Results (In Vitro) - 웨스턴 블롯 및 유세포 분석을 통한 단백질 소멸 kinetics
+                            </div>
+                            <div class="p-2.5 bg-slate-50 rounded text-slate-800">
+                                <strong class="text-purple-700">Panel 3:</strong> Results (In Vivo) - 이종이식 마우스 모델에서의 항종양 효능 및 혈액 독성 지표
+                            </div>
+                            <div class="p-2.5 bg-slate-50 rounded text-slate-800">
+                                <strong class="text-purple-700">Panel 4:</strong> Discussion - 케이메디허브 의약생산센터 연계를 통한 비임상 시제품 생산 계획
+                            </div>
+                        </div>
+                    </div>
+                `;
+                showToast('학술 3단 요약 리포트가 생성되었습니다.');
+            });
+
+            document.getElementById('copyPosterSummaryBtn').addEventListener('click', function() {
+                const text = document.getElementById('posterOutputBox').innerText;
+                copyToClipboard(text, '학술 요약 리포트가 복사되었습니다.');
+            });
+
+            // --- Video Script Tab ---
+            document.getElementById('generateVideoScriptBtn').addEventListener('click', function() {
+                const topic = document.getElementById('videoTopicInput').value.trim();
+                const format = document.getElementById('videoFormatSelect').value;
+                const tone = document.getElementById('videoToneSelect').value;
+                const keywords = document.getElementById('videoKeywordsInput').value.trim();
+
+                const box = document.getElementById('videoScriptBox');
+                box.innerHTML = `
+                    <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col space-y-1.5">
+                        <div class="flex items-center justify-between text-[11px]">
+                            <span class="font-bold text-rose-600 bg-rose-100 px-2 py-0.5 rounded">Scene 1 (00:00 ~ 00:08) - 인트로 후킹</span>
+                            <span class="text-slate-400">화면비 9:16</span>
+                        </div>
+                        <div class="text-xs text-slate-800">
+                            <p><strong>[화면 연출]:</strong> 현미경 클로즈업 및 연구원 실험 장면 ➔ 빠른 암세포 3D 그래픽 트랜지션</p>
+                            <p class="mt-1 text-slate-900 font-medium bg-white p-2 rounded border border-slate-200/80">
+                                <strong>[내레이션]:</strong> “${topic} 지금 바로 그 현장을 공개합니다!”
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col space-y-1.5">
+                        <div class="flex items-center justify-between text-[11px]">
+                            <span class="font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded">Scene 2 (00:08 ~ 00:28) - 핵심 연구 성과</span>
+                            <span class="text-slate-400">연구실 현장</span>
+                        </div>
+                        <div class="text-xs text-slate-800">
+                            <p><strong>[화면 연출]:</strong> 대구 첨복단지 연구 장비와 후보물질 합성 공정 ➔ 주요 수치 그래픽 팝업</p>
+                            <p class="mt-1 text-slate-900 font-medium bg-white p-2 rounded border border-slate-200/80">
+                                <strong>[내레이션]:</strong> “기존 치료제 대비 무려 4.8배 뛰어난 효능! 핵심 키워드 [${keywords}]를 기반으로 이뤄낸 쾌거입니다.”
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col space-y-1.5">
+                        <div class="flex items-center justify-between text-[11px]">
+                            <span class="font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded">Scene 3 (00:28 ~ 00:48) - 케이메디허브의 역할</span>
+                            <span class="text-slate-400">원스톱 인프라</span>
+                        </div>
+                        <div class="text-xs text-slate-800">
+                            <p><strong>[화면 연출]:</strong> 신약개발센터, 전임상센터, 의약생산센터의 융합 지원 파이프라인 그래픽</p>
+                            <p class="mt-1 text-slate-900 font-medium bg-white p-2 rounded border border-slate-200/80">
+                                <strong>[내레이션]:</strong> “아이디어만 있으면 신약 설계부터 시제품 생산까지! 국내 바이오벤처의 든든한 멘토, 케이메디허브가 함께합니다.”
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col space-y-1.5">
+                        <div class="flex items-center justify-between text-[11px]">
+                            <span class="font-bold text-purple-600 bg-purple-100 px-2 py-0.5 rounded">Scene 4 (00:48 ~ 01:00) - 클로징 및 CTA</span>
+                            <span class="text-slate-400">로고 & 채널</span>
+                        </div>
+                        <div class="text-xs text-slate-800">
+                            <p><strong>[화면 연출]:</strong> K-MEDI HUB 심벌 마크 및 공식 유튜브 채널 구독 유도 배너</p>
+                            <p class="mt-1 text-slate-900 font-medium bg-white p-2 rounded border border-slate-200/80">
+                                <strong>[내레이션]:</strong> “대한민국 의료산업의 밝은 내일, 케이메디허브 채널 구독과 좋아요로 함께 응원해주세요!”
+                            </p>
+                        </div>
+                    </div>
+                `;
+                showToast('영상 스크립트 대본이 생성되었습니다.');
+            });
+
+            document.getElementById('copyVideoScriptBtn').addEventListener('click', function() {
+                const text = document.getElementById('videoScriptBox').innerText;
+                copyToClipboard(text, '영상 대본 전문이 복사되었습니다.');
+            });
+
+            // --- Archive Table Rendering ---
+            function renderArchiveTable() {
+                const tbody = document.getElementById('archiveTableBody');
+                const badge = document.getElementById('savedCountBadge');
+                badge.textContent = archiveList.length;
+
+                if (archiveList.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">보관된 콘텐츠가 없습니다.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = archiveList.map((item, idx) => {
+                    let catColor = 'bg-blue-100 text-blue-800';
+                    if (item.category === '카드뉴스') catColor = 'bg-emerald-100 text-emerald-800';
+                    else if (item.category === '영상대본') catColor = 'bg-rose-100 text-rose-800';
+
+                    return `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="p-3"><span class="px-2 py-0.5 rounded font-bold text-[10px] ${catColor}">${item.category}</span></td>
+                            <td class="p-3 font-semibold text-slate-900 max-w-[280px] truncate" title="${item.title}">${item.title}</td>
+                            <td class="p-3 text-slate-600">${item.dept}</td>
+                            <td class="p-3 text-slate-400 font-mono text-[11px]">${item.date}</td>
+                            <td class="p-3 text-right space-x-1.5 whitespace-nowrap">
+                                <button type="button" class="load-arch-btn px-2.5 py-1 bg-slate-100 hover:bg-blue-50 text-blue-700 rounded font-medium text-[11px]" data-id="${item.id}">불러오기</button>
+                                <button type="button" class="del-arch-btn px-2 py-1 bg-slate-100 hover:bg-rose-50 text-rose-600 rounded font-medium text-[11px]" data-id="${item.id}">삭제</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                // Attach events
+                document.querySelectorAll('.load-arch-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        const item = archiveList.find(a => a.id === id);
+                        if (item && item.presetKey) {
+                            loadPreset(item.presetKey);
+                            switchTab('tab-press');
+                            showToast(`‘${item.title}’ 작업을 스튜디오로 불러왔습니다.`);
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.del-arch-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        archiveList = archiveList.filter(a => a.id !== id);
+                        saveArchiveStorage();
+                        showToast('선택한 항목이 삭제되었습니다.');
+                    });
+                });
+            }
+
+            // Clear Archive with Toast Undo / Confirm state
+            let clearPending = false;
+            const clearBtn = document.getElementById('clearArchiveBtn');
+            clearBtn.addEventListener('click', function() {
+                if (!clearPending) {
+                    clearPending = true;
+                    clearBtn.textContent = '정말 삭제할까요? (한번 더 클릭)';
+                    clearBtn.classList.remove('bg-rose-50', 'text-rose-600');
+                    clearBtn.classList.add('bg-rose-600', 'text-white');
+                    showToast('삭제하려면 버튼을 한 번 더 누르세요.');
+                    setTimeout(() => {
+                        clearPending = false;
+                        clearBtn.textContent = '전체 비우기';
+                        clearBtn.classList.remove('bg-rose-600', 'text-white');
+                        clearBtn.classList.add('bg-rose-50', 'text-rose-600');
+                    }, 4000);
+                } else {
+                    archiveList = [];
+                    saveArchiveStorage();
+                    clearPending = false;
+                    clearBtn.textContent = '전체 비우기';
+                    clearBtn.classList.remove('bg-rose-600', 'text-white');
+                    clearBtn.classList.add('bg-rose-50', 'text-rose-600');
+                    showToast('보관함의 모든 항목이 삭제되었습니다.');
+                }
+            });
+
+            // Export Archive JSON
+            document.getElementById('exportArchiveJsonBtn').addEventListener('click', function() {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(archiveList, null, 2));
+                const a = document.createElement('a');
+                a.setAttribute("href", dataStr);
+                a.setAttribute("download", `kmedi_hub_archive_${new Date().toISOString().slice(0,10)}.json`);
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                showToast('아카이브 JSON 파일이 다운로드되었습니다.');
+            });
+
+            // Initial Setup
+            loadSlideInputs(0);
+            renderArchiveTable();
+            generatePressRelease();
+
+        })();
+    </script>
+</body>
+</html>
